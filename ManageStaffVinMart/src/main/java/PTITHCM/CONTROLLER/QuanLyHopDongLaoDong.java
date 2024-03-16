@@ -1,0 +1,189 @@
+package PTITHCM.CONTROLLER;
+
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import javax.transaction.Transactional;
+
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import PTITHCM.BEAN.BangLuong;
+import PTITHCM.BEAN.HopDongLaoDong;
+
+import PTITHCM.BEAN.TaiKhoan;
+
+@Controller
+@Transactional
+public class QuanLyHopDongLaoDong {
+	
+	@Autowired
+	SessionFactory factory;
+	 
+	@RequestMapping("table-basic")
+	public String timeTable(ModelMap model) {
+		Session session = factory.getCurrentSession();
+		String hql = "From HopDongLaoDong Where manv.matk.quyen.tenQuyen = ?";
+		Query query = session.createQuery(hql).setParameter(0, "users");
+		List<HopDongLaoDong>list = query.list();
+		model.addAttribute("hdld",list);
+		session = factory.getCurrentSession();
+		 hql = "From TaiKhoan where quyen.tenQuyen = ? ORDER BY nhanvien.maNV";
+		 query = session.createQuery(hql).setParameter(0, "users");
+		List<TaiKhoan>list1 = query.list();
+		model.addAttribute("tk", list1);	
+		 hql = "From BangLuong";
+		 query = session.createQuery(hql);
+		List<BangLuong>list2 = query.list();
+		model.addAttribute("bangluong",list2);
+		return "timetable";
+	}
+	@RequestMapping(value = "table-basic.html#inform",method = RequestMethod.GET)
+	public String themhopdonglaodong(ModelMap model) {
+		model.addAttribute("hopdonglaodong",new HopDongLaoDong());
+		return "timtable";
+	}
+	public Boolean kiemTraThoiHan(String id, Date start, Date end) {
+	    Session session = factory.getCurrentSession();
+	    String hql = "From HopDongLaoDong Where manv.maNV = ?";
+	    Query query = session.createQuery(hql).setParameter(0, id);
+	    List<HopDongLaoDong> list = query.list();
+	    Calendar calendar = Calendar.getInstance();
+	    calendar.setTime(start);
+	    int year1 = calendar.get(Calendar.YEAR);
+	    int day1 = calendar.get(Calendar.DATE);
+	    int month1 = calendar.get(Calendar.MONTH);
+	    Calendar calendar1 = Calendar.getInstance();
+	    calendar1.setTime(end);
+	    int year2 = calendar1.get(Calendar.YEAR);
+	    int day2 = calendar1.get(Calendar.DATE);
+	    int month2 = calendar1.get(Calendar.MONTH);
+
+	    for (HopDongLaoDong k : list) {
+	    		if(k.getNgayBatDau().equals(start) && k.getNgayKetThuc().equals(end)) {
+	    			return false;
+	    		}
+	            Calendar calendar3 = Calendar.getInstance();
+	            calendar3.setTime(k.getNgayBatDau());
+	            int year3 = calendar3.get(Calendar.YEAR);
+	            int day3 = calendar3.get(Calendar.DATE);
+	            int month3 = calendar3.get(Calendar.MONTH);
+
+	            Calendar calendar4 = Calendar.getInstance();
+	            calendar4.setTime(k.getNgayKetThuc());
+	            int year4 = calendar4.get(Calendar.YEAR);
+	            int day4 = calendar4.get(Calendar.DATE);
+	            int month4 = calendar4.get(Calendar.MONTH);
+
+	            if ((year1 > year3 && year1 < year4) || (year2 > year3 && year2 < year4) || (year1 == year3 && year2 == year4 && (month2 - month1) == 12)) {
+	                return false;
+	            } else if ((year1 == year3 && year2 == year4 && (month2 - month1) != 12 && (day2 - day1) < 0) || (year1 == year3 && (month1 < month3 || (month1 == month3 && day1 < day3)))) {
+	                return false;
+	            } else if ((year2 == year4 && (month2 > month4 || (month2 == month4 && day2 > day4)))) {
+	                return false;
+	            }
+	        
+	    }
+	    return true;
+	}
+	@RequestMapping(params = "btncreate-contract",method = RequestMethod.POST)
+	public String themhopdonglaodong(RedirectAttributes redirectAttributes, @ModelAttribute("hopdonglaodong") HopDongLaoDong hdld,
+			@RequestParam("manv.maNV") String id) throws ParseException {
+		Session session = factory.openSession();
+		org.hibernate.Transaction t = session.beginTransaction();
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(hdld.getNgayBatDau());
+		int year1 = calendar.get(Calendar.YEAR);
+		int day1 = calendar.get(Calendar.DATE);
+		int month1 = calendar.get(Calendar.MONTH);
+		Calendar calendar1 = Calendar.getInstance();
+		calendar1.setTime(hdld.getNgayKetThuc());
+		int year2 = calendar1.get(Calendar.YEAR);
+		int day2 = calendar1.get(Calendar.DATE);
+		int month2 = calendar1.get(Calendar.MONTH);
+		Date date = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		String formattedDate = sdf.format(date);
+		Date newDate = sdf.parse(formattedDate);
+		if (hdld.getNgayBatDau().equals(newDate)) {
+				if (year1 == year2) {
+				    if ((month1 + 1) == 1 && (month2 + 1) == 12) {
+				    	Boolean flag = kiemTraThoiHan(id,hdld.getNgayBatDau(),hdld.getNgayKetThuc());
+				    	 if(flag == false) {
+						    	redirectAttributes.addFlashAttribute("mess3", "Không thể tạo mới vì vẫn còn hợp đồng");
+								return "redirect:/table-basic.html";
+						    }
+				    }  else {
+						redirectAttributes.addFlashAttribute("mess3", "Khoảng thời gian không hợp lệ vì không đủ một năm");
+						return "redirect:/table-basic.html";
+					}
+				}
+				else if (year2 > year1) {
+					if(month2 < month1) {
+						redirectAttributes.addFlashAttribute("mess3","Khoảng thời gian không hợp lệ vì không đủ một năm");
+						return "redirect:/table-basic.html";
+					}
+					if (month2 > month1) {
+						redirectAttributes.addFlashAttribute("mess3","Không được chọn hơn một năm");
+						return "redirect:/table-basic.html";
+					}
+					Boolean flag = kiemTraThoiHan(id,hdld.getNgayBatDau(),hdld.getNgayKetThuc());				
+				    if(flag == false) {
+				    	redirectAttributes.addFlashAttribute("mess3", "Không thể tạo mới vì vẫn còn hợp đồng");
+						return "redirect:/table-basic.html";
+				    }
+				}
+			}
+	 else {
+			redirectAttributes.addFlashAttribute("mess3", "Ngày bắt đầu phải là ngày hiện tại");
+			return "redirect:/table-basic.html";
+		}
+		
+		try {
+			session.save(hdld);
+			redirectAttributes.addFlashAttribute("mess3", "Thêm hợp đồng thành công");
+			t.commit();
+		}catch(Exception e) {
+			t.rollback();
+		}
+		finally {
+			session.close();
+		}
+		return "redirect:/table-basic.html";
+	}
+	
+	@RequestMapping(params = "btnupdate-contract",method = RequestMethod.POST)
+	public String capnhathopdonglaodong(ModelMap model,@ModelAttribute("nhanviencuahang") HopDongLaoDong hdld) {
+		Session session = factory.openSession();
+		String hql = "update HopDongLaoDong s set s.ngayBatDau=?,s.ngayKetThuc = ? where s.manv.maNV= ?";
+		Query query = session.createQuery(hql);
+		query.setParameter(0, hdld.getNgayBatDau());
+		query.setParameter(1, hdld.getNgayKetThuc());
+		query.setParameter(2, hdld.getManv().getMaNV());
+		
+		int row = query.executeUpdate();
+		org.hibernate.Transaction t = session.beginTransaction();
+		try {
+			
+			t.commit();
+		}catch(Exception e) {
+			t.rollback();
+		}
+		return "redirect:/table-basic.html";
+	}
+}

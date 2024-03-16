@@ -1,0 +1,76 @@
+package PTITHCM.CONTROLLER;
+import java.util.List;
+
+import org.hibernate.Query;
+import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
+import PTITHCM.BEAN.NhanVien;
+import PTITHCM.BEAN.TaiKhoan;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+@Transactional
+@Controller
+public class FormLogin{
+	@Autowired
+	SessionFactory factory;
+	@RequestMapping("home")
+	public String homeLogin() {
+		return "home";
+	}
+	
+	@RequestMapping("homepage")
+	public String homePage(ModelMap model, HttpServletRequest request) {
+			String user = request.getParameter("user");
+			String password = request.getParameter("password");
+			if (user.equalsIgnoreCase("admin")&& password.equalsIgnoreCase("123")) {
+				model.addAttribute(user);
+				model.addAttribute(password);
+				return "homepage";
+			}
+			return "home";
+	}
+	@RequestMapping("homepage1")
+	public String homePage2() {
+		return "homepage2";
+	}
+	@RequestMapping("manageaccount")
+	public String account(ModelMap model) {
+		Session session = factory.getCurrentSession();
+		String hql = "From TaiKhoan";
+		Query query = session.createQuery(hql);
+		List<TaiKhoan>list = query.list();
+		model.addAttribute("tk",list);
+		return "homepage";
+	}
+	@RequestMapping("pages-profile")
+	public String staff(ModelMap model) {
+		Session session = factory.getCurrentSession();
+		String hql = "From NhanVien Where matk.chucvu.tenCV =?";
+		Query query = session.createQuery(hql).setParameter(0, "Nhân viên");
+		List<NhanVien>list = query.list();
+		model.addAttribute("nv",list);
+		return "staff";
+	}
+	
+	@RequestMapping("form-basic")
+	public String salary() {
+		return "salary";
+	}
+	
+	@RequestMapping("table-basic")
+	public String timeTable() {
+		return "timetable";
+	}
+	
+	@RequestMapping("starter-kit")
+	public String attendCheck() {
+		return "attendcheck";
+	}
+}

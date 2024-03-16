@@ -1,0 +1,58 @@
+package PTITHCM.BEAN;
+
+import java.util.Collection;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
+@Entity
+@Table(name = "BANGLUONG")
+public class BangLuong {
+	@Id
+	@Column(name = "BACLUONG")
+	private int bacluong;
+	@Column(name = "LUONGCOBAN")
+	private int luongcoban;
+	
+//	@OneToMany(mappedBy = "blnvv")
+//	@LazyCollection(LazyCollectionOption.FALSE)
+//	private Collection <NhanVien> dsnvluong;
+
+	public BangLuong() {
+		super();
+	}
+
+	public BangLuong(int bacluong, int luongcoban) {
+		super();
+		this.bacluong = bacluong;
+		this.luongcoban = luongcoban;
+		
+	}
+
+	public int getBacluong() {
+		return bacluong;
+	}
+
+	public void setBacluong(int bacluong) {
+		this.bacluong = bacluong;
+	}
+
+	public int getLuongcoban() {
+		return luongcoban;
+	}
+
+	public void setLuongcoban(int luongcoban) {
+		this.luongcoban = luongcoban;
+	}
+
+	
+	
+	
+}

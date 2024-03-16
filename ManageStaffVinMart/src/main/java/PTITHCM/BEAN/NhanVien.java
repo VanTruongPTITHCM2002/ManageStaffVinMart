@@ -1,0 +1,175 @@
+package PTITHCM.BEAN;
+
+import java.util.Collection;
+import java.util.Date;
+
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
+import org.springframework.format.annotation.DateTimeFormat;
+@Entity
+@Table(name = "NHANVIEN")
+public class NhanVien {
+	@Id
+	@Column(name = "MANV")
+	private String maNV;
+	@OneToOne(mappedBy = "nhanvien")
+	private TaiKhoan matk;
+	@Column(name = "HO")
+	public String ho;
+	@Column(name = "TEN")
+	public String ten;
+	@Column(name = "GIOITINH")
+	public String gioiTinh;
+	@Temporal(TemporalType.DATE)
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@Column(name = "NGAYSINH")
+	public Date ngaySinh;
+	@Column(name = "DIACHI")
+	public String diaChi;
+	@Column(name = "SDT")
+	public String sdt;
+	@Column(name = "EMAIL")
+	public String email;
+	@OneToMany(mappedBy = "manvql")
+	@LazyCollection(LazyCollectionOption.FALSE)
+	private Collection <ThongBao> dstb;
+	@OneToMany(mappedBy = "manv")
+	@LazyCollection(LazyCollectionOption.FALSE)
+	private Collection<HopDongLaoDong> hdld;
+	@OneToMany(mappedBy = "nhanvienluong")
+	@LazyCollection(LazyCollectionOption.FALSE)
+	private Collection <CTBANGLUONG> dsctbl;
+	@OneToMany(mappedBy = "manhanvienthongbao")
+	@LazyCollection(LazyCollectionOption.FALSE)
+	private Collection <CTThongbao> dscttb;
+	@OneToMany(mappedBy = "manhanvien")
+	@LazyCollection(LazyCollectionOption.FALSE)
+	private Collection <LichLamViec> lichlamviec;
+	
+	
+	public NhanVien() {
+		super();
+	}
+	public NhanVien(String maNV, TaiKhoan matk, String ho, String ten, String gioiTinh, Date ngaySinh, String diaChi,
+			String sdt, String email, Collection<ThongBao> dstb, Collection<HopDongLaoDong> hdld,
+			Collection<CTBANGLUONG> dsctbl, Collection<CTThongbao> dscttb, Collection<LichLamViec> lichlamviec) {
+		super();
+		this.maNV = maNV;
+		this.matk = matk;
+		this.ho = ho;
+		this.ten = ten;
+		this.gioiTinh = gioiTinh;
+		this.ngaySinh = ngaySinh;
+		this.diaChi = diaChi;
+		this.sdt = sdt;
+		this.email = email;
+		this.dstb = dstb;
+		this.hdld = hdld;
+		this.dsctbl = dsctbl;
+		this.dscttb = dscttb;
+		this.lichlamviec = lichlamviec;
+	}
+	public String getMaNV() {
+		return maNV;
+	}
+	public void setMaNV(String maNV) {
+		this.maNV = maNV;
+	}
+	public TaiKhoan getMatk() {
+		return matk;
+	}
+	public void setMatk(TaiKhoan matk) {
+		this.matk = matk;
+	}
+	public String getHo() {
+		return ho;
+	}
+	public void setHo(String ho) {
+		this.ho = ho;
+	}
+	public String getTen() {
+		return ten;
+	}
+	public void setTen(String ten) {
+		this.ten = ten;
+	}
+	public String getGioiTinh() {
+		return gioiTinh;
+	}
+	public void setGioiTinh(String gioiTinh) {
+		this.gioiTinh = gioiTinh;
+	}
+	public Date getNgaySinh() {
+		return ngaySinh;
+	}
+	public void setNgaySinh(Date ngaySinh) {
+		this.ngaySinh = ngaySinh;
+	}
+	public String getDiaChi() {
+		return diaChi;
+	}
+	public void setDiaChi(String diaChi) {
+		this.diaChi = diaChi;
+	}
+	public String getSdt() {
+		return sdt;
+	}
+	public void setSdt(String sdt) {
+		this.sdt = sdt;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public Collection<ThongBao> getDstb() {
+		return dstb;
+	}
+	public void setDstb(Collection<ThongBao> dstb) {
+		this.dstb = dstb;
+	}
+	public Collection<HopDongLaoDong> getHdld() {
+		return hdld;
+	}
+	public void setHdld(Collection<HopDongLaoDong> hdld) {
+		this.hdld = hdld;
+	}
+	public Collection<CTBANGLUONG> getDsctbl() {
+		return dsctbl;
+	}
+	public void setDsctbl(Collection<CTBANGLUONG> dsctbl) {
+		this.dsctbl = dsctbl;
+	}
+	public Collection<CTThongbao> getDscttb() {
+		return dscttb;
+	}
+	public void setDscttb(Collection<CTThongbao> dscttb) {
+		this.dscttb = dscttb;
+	}
+	public Collection<LichLamViec> getLichLamViec() {
+		return lichlamviec;
+	}
+	public void setLichLamViec(Collection<LichLamViec> lichlamviec) {
+		this.lichlamviec = lichlamviec;
+	}
+	
+	
+	
+	
+}

@@ -1,0 +1,9 @@
+
+thg 5 16, 2023 07:23:29.797 NEW SESSION
+thg 5 16, 2023 07:23:29.797 [27416:19424:0516/072329.795:ERROR:connection_factory_impl.cc(428)] Failed to connect to MCS endpoint with error -106
+thg 5 16, 2023 07:23:29.798 [27416:19424:0516/072329.795:ERROR:checkin_request.cc(243)] Check-in request got net error: -106
+thg 5 16, 2023 07:23:29.798 [27416:19424:0516/072329.795:ERROR:registration_request.cc(251)] Registration URL fetching failed.
+thg 5 16, 2023 07:23:52.702 [27416:19424:0516/072352.700:ERROR:checkin_request.cc(243)] Check-in request got net error: -106
+thg 5 16, 2023 07:23:54.329 [27416:19424:0516/072354.329:ERROR:registration_request.cc(251)] Registration URL fetching failed.
+thg 5 16, 2023 07:23:55.716 [27416:19424:0516/072355.716:ERROR:connection_factory_impl.cc(428)] Failed to connect to MCS endpoint with error -106
+thg 5 16, 2023 07:24:01.588 [27416:23960:0516/072401.580:ERROR:account_info_fetcher.cc(62)] OnGetTokenFailure: Connection failed (-106).

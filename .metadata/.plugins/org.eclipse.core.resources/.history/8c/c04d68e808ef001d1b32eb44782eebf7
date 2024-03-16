@@ -1,0 +1,121 @@
+package PTITHCM.CONTROLLER;
+
+import java.util.Calendar;
+import java.util.List;
+
+import javax.transaction.Transactional;
+
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import PTITHCM.BEAN.BangLuong;
+import PTITHCM.BEAN.CTBANGLUONG;
+import PTITHCM.BEAN.CTBANGLUONGUPDATE;
+import PTITHCM.BEAN.HopDongLaoDong;
+import PTITHCM.BEAN.NhanVien;
+
+@Controller
+@Transactional
+public class QuanLyBangLuong {
+	@Autowired
+	SessionFactory factory;
+	
+	@RequestMapping("form-basic")
+	public String salary(ModelMap model) {
+		Session session = factory.getCurrentSession();
+		String hql = "From CTBANGLUONG";
+		Query query = session.createQuery(hql);
+		List<CTBANGLUONG>list = query.list();
+		hql = "From HopDongLaoDong";
+		query = session.createQuery(hql);
+		List<HopDongLaoDong> hdld = query.list();
+		model.addAttribute("chitietbangluong",list);
+		model.addAttribute("hdld", hdld);
+		return "salary";
+	}
+	
+	@RequestMapping(value = "form-basic.html#inform",method = RequestMethod.GET)
+	public String themluong(ModelMap model) {
+		 model.addAttribute("chitietbangluong", new CTBANGLUONG());
+		return "salary";
+	}
+	
+	public String kiemTraThoiGian(String id,int thang,int nam) {
+		String chuoi = "";
+		Session session = factory.getCurrentSession();
+		String hql = "From HopDongLaoDong where manv.maNV = ?";
+		Query query = session.createQuery(hql).setParameter(0, id);
+		List <HopDongLaoDong> k = query.list();
+		Calendar calendar = Calendar.getInstance();
+		int month = calendar.get(Calendar.MONTH);
+		int year = calendar.get(Calendar.YEAR);
+		if (nam < year) {
+			chuoi = "Năm không hợp lệ";
+			return chuoi;
+		}
+		else {
+			if (thang > month) {
+				chuoi = "Tháng không hợp lệ";
+				return chuoi;
+			}
+		}
+		for(HopDongLaoDong q: k) {
+			Calendar calendar3 = Calendar.getInstance();
+			calendar3.setTime(q.getNgayBatDau());
+			int year3 = calendar3.get(Calendar.YEAR);
+			int day3 = calendar3.get(Calendar.DATE);
+			int month3 = calendar3.get(Calendar.MONTH);
+			
+			Calendar calendar4 = Calendar.getInstance();
+			calendar4.setTime(q.getNgayBatDau());
+			int year4 = calendar4.get(Calendar.YEAR);
+			int day4= calendar4.get(Calendar.DATE);
+			int month4 = calendar4.get(Calendar.MONTH);
+			
+			if (nam >= year3 && nam <= year4) {
+				if (thang > (month4 + 1) || thang < (month3 + 1)) {
+					chuoi = "Tháng không hợp lệ vì năm ngoài hợp đồng quy định";
+				}
+			}
+			else {
+				chuoi = "Năm không hợp lệ vì năm ngoài hợp đồng quy định";
+			}
+			
+		}
+		return chuoi;
+	}
+	@RequestMapping(params = "btncreate-salary", method = RequestMethod.POST)
+	public String themluong(RedirectAttributes redirectAttributes, @ModelAttribute("chitietbangluong") CTBANGLUONG ctluong,
+			@RequestParam("nhanvienluong.maNV") String id) {
+		Session session = factory.openSession();
+		Transaction t = session.beginTransaction();
+		String test = kiemTraThoiGian(id,ctluong.getThang(),ctluong.getNam());
+		if (test.equals("Năm không hợp lệ") || test.equals("Tháng không hợp lệ")
+				|| test.equals("Tháng không hợp lệ vì năm ngoài hợp đồng quy định") ||
+				test.equals("Năm không hợp lệ vì năm ngoài hợp đồng quy định")) {
+			redirectAttributes.addFlashAttribute("mess2",test);
+			return "redirect:/form-basic.html";
+		}
+		 try {	
+		        session.save(ctluong);
+		        t.commit();
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		        t.rollback();
+		    } finally {
+		        session.close();
+		    }
+		    return "redirect:/form-basic.html";
+	}
+	
+}

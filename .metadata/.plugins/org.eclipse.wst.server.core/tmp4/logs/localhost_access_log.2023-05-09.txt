@@ -1,0 +1,7 @@
+127.0.0.1 - - [09/May/2023:08:21:42 +0700] "GET / HTTP/1.1" 404 751
+0:0:0:0:0:0:0:1 - - [09/May/2023:08:21:44 +0700] "GET /ManageStaffVinMart/ HTTP/1.1" 200 3611
+0:0:0:0:0:0:0:1 - - [09/May/2023:08:21:44 +0700] "GET /favicon.ico HTTP/1.1" 404 762
+0:0:0:0:0:0:0:1 - - [09/May/2023:08:21:48 +0700] "POST /ManageStaffVinMart/home.html HTTP/1.1" 302 -
+0:0:0:0:0:0:0:1 - - [09/May/2023:08:21:48 +0700] "GET /ManageStaffVinMart/homepage1.html HTTP/1.1" 200 19821
+0:0:0:0:0:0:0:1 - - [09/May/2023:08:21:48 +0700] "GET /ManageStaffVinMart/resources2/assets/images/logo-vinmart-inkythuatso.png HTTP/1.1" 404 839
+0:0:0:0:0:0:0:1 - - [09/May/2023:08:21:51 +0700] "GET /ManageStaffVinMart/manageaccount.html HTTP/1.1" 200 34766

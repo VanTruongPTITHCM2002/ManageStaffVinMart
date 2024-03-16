@@ -1,0 +1,71 @@
+package PTITHCM.CONTROLLER;
+
+import java.time.ZonedDateTime;
+import java.util.Calendar;
+import java.util.List;
+
+import javax.transaction.Transactional;
+
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import PTITHCM.BEAN.NhanVien;
+
+
+@Controller
+@Transactional
+public class QuanLyThongTinCaNhan {
+	@Autowired
+	SessionFactory factory;
+	
+	@RequestMapping("thongtincanhan")
+	public String infoPersonal(ModelMap model) {
+		Session session = factory.getCurrentSession();
+		String hql = "From NhanVien Where matk.quyen.tenQuyen = ?";
+		Query query = session.createQuery(hql).setParameter(0, "admin");
+		List<NhanVien>list = query.list();
+		model.addAttribute("nvql",list);
+		return "thongtincanhan";
+	}
+	
+	@RequestMapping(value = "update-inform.html",params = "btnupdate-employer",method = RequestMethod.POST)
+	public String updatePersonal(RedirectAttributes rd, @ModelAttribute("nvql") NhanVien nv) {
+		Session session = factory.openSession();
+		String hql = "update NhanVien s set s.ho = ?, s.ten = ?, s.gioiTinh = ?,s.ngaySinh = ?,s.diaChi = ?,s.sdt=?,s.email = ? where s.maNV = ?";
+		Query query = session.createQuery(hql);
+		query.setParameter(0, nv.ho);
+		query.setParameter(1, nv.ten);
+		query.setParameter(2, nv.gioiTinh);
+		query.setParameter(3, nv.ngaySinh);
+		query.setParameter(4, nv.diaChi);
+		query.setParameter(5, nv.sdt);
+		query.setParameter(6, nv.email);
+		query.setParameter(7, nv.getMaNV());
+		int row = query.executeUpdate();
+		ZonedDateTime zonedDateTime = ZonedDateTime.now();
+	    int year = zonedDateTime.getYear();
+	    Calendar calendar = Calendar.getInstance();
+	    calendar.setTime(nv.ngaySinh);
+	    int year1 = calendar.get(Calendar.YEAR);
+		if (year - year1 < 18) {
+			rd.addFlashAttribute("mess5", "Ngày tháng năm sinh không hợp lệ");
+			return "redirect:/pages-profile.html";
+		}
+		org.hibernate.Transaction t = session.beginTransaction();
+		try {
+			rd.addFlashAttribute("mess5", "Cập nhật nhân viên thành công");
+			t.commit();
+		}catch(Exception e) {
+			t.rollback();
+		}
+		return "redirect:/thongtincanhan.html";
+	}
+}
